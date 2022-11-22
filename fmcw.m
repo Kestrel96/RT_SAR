@@ -18,7 +18,7 @@ delta_fz=1/T; %
 %% Platform Setup
 R=10;
 L=2*R*tan(ant_angle);
-pulses = 100; % pulses during target ilumination
+pulses =1000; % pulses during target ilumination
 v=10;
 time=L/v; % time of ilumination
 
@@ -37,7 +37,7 @@ d_max=fs*c/(2*Beta);
 
 % Preallocate SAR memory
 %t=0:1/fs:0.001*PRI*fs-1/fs;
-samples=100;
+samples=500;
 t=0:1/fs:1/fs*samples-1/fs;
 SAR_raw=zeros(100,length(t));
 SAR_range_compressed=zeros(100,length(t));
@@ -45,9 +45,9 @@ SAR_range_compressed=zeros(100,length(t));
 % t=2*d/c;
 d=f0*T*c/(2*Beta);
 
-figure
-tmp=exp(i*(2*pi*f0*t+phi));
-plot(real(tmp(1:100)))
+% figure
+% tmp=exp(i*(2*pi*f0*t+phi));
+% plot(real(tmp(1:100)))
 
 
 
@@ -62,21 +62,14 @@ end
 
 
 %% Range compression
-
-% for k=1:pulses
-%     SAR_range_compressed(k,:)=abs(real(fftshift(fft(SAR_raw(k,:)))));
-% end
-
-
-% for k=1:pulses
-%     plot(SAR_range_compressed(k,:))
-%     waitforbuttonpress
-% end
+for k=1:pulses
+    SAR_range_compressed(k,:)=fft(SAR_raw(k,:));
+end
 
 
 %% Azimuth
 figure
-achp=SAR_raw(:,50);
+achp=SAR_raw(:,200);
 plot(real(achp));
 
 
@@ -86,14 +79,12 @@ faxis=0:1/fs:samples*1/fs-1/fs;
 figure
 tiledlayout(1,3)
 nexttile
-imagesc('xData',faxis,real(SAR_raw));
+imagesc(real(SAR_raw));
 xlabel("Sample")
 ylabel("Pulse")
-
 nexttile
-X=fft2(SAR_raw,1000,1000);
 title("Range compressed data")
-imagesc(abs(real(X)));
+imagesc(db((SAR_range_compressed)));
 
 % plot(real(SAR_raw(1,1:100))
 
