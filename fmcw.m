@@ -14,6 +14,9 @@ ant_angle=deg2rad(30); % antenna beam angle
 delta_R=c/2/B; %range resoultion
 delta_fz=1/T; %frequency resolution (?)
 
+% alt = 400m
+% sigma_r=~ 2m
+
 
 %% Platform Setup
 % All parameters are dependent on pulses in azimuth
@@ -41,7 +44,9 @@ d_max=fs*c/(2*Beta);
 
 %t=0:1/fs:0.001*PRI*fs-1/fs;
 
-samples=100; % Amount of samples (in range) of beat signal
+%samples=100; % Amount of samples (in range) of beat signal
+
+samples=floor(fs*PRI);
 
 t=0:1/fs:1/fs*samples-1/fs;
 
@@ -71,9 +76,32 @@ for k=1:pulses
     r=sqrt(R^2+(L/2-step*k)^2);
 
     % Receive echo (get beat)
-    SAR_raw(k,:)=get_beat(r,t,lambda,Beta,T);
+    SAR_raw(k,:)=get_beat(r,t,lambda,Beta,T)+randn(1,length(t));
 
-    % BPA
+   
+
+    
+
+end
+
+
+
+
+%% Range compression
+for k=1:pulses
+    SAR_range_compressed(k,:)=fft(SAR_raw(k,:));
+end
+
+% Edn simulation
+
+
+% Remake as function
+% Iterate through all pixels 
+% Check range resolution, fix axis and range cells. 
+%% BPA
+for k=1:pulses
+
+     % BPA
     % Calculate position (x,y)
     % r=sqrt((x_radar-x_point)^2+((y_radar-y_point)^2)
     
@@ -82,17 +110,10 @@ for k=1:pulses
     R_ap(:,k)=sqrt((x-x_p)^2+(y-y_p)^2); % BPA distance
     n=(R_ap-2*0)/(2*sigma_r); % Index of range cell, r_min is 0.
     h(:,k)=exp(1i*2*pi*R_ap(k)/lambda); % vector of filter coefficients
-
-    
-
+    % Define -j or +j (add some switch or smth)
 end
 
-
-%% Range compression
-for k=1:pulses
-    SAR_range_compressed(k,:)=fft(SAR_raw(k,:));
-end
-
+%% RCMC
 
 %% Azimuth
 
@@ -131,7 +152,7 @@ imagesc(db(abs(SAR_range_compressed)));
 %%
 
 figure
-plot(real(SAR_range_compressed(:,21)));
+plot(real(SAR_range_compressed(:,78)));
 
 
 
@@ -151,6 +172,9 @@ plot(real(SAR_range_compressed(:,21)));
 
 
 
+% zdecydowanie poniżej kilometra
+% splot w częstotliwości ?
+% przypomnij sobi eoblinaie splotu, fft
 
 
 
@@ -158,7 +182,7 @@ plot(real(SAR_range_compressed(:,21)));
 
 
 
-
+% delta f = 2dv/c*f_0
 
 
 
