@@ -56,6 +56,7 @@ azimuth_cells=0:sigma_a:sigma_a*pulses;
 % Preallocate SAR memory
 SAR_raw=zeros(int32(pulses),length(t));
 SAR_range_compressed=zeros(int32(pulses),length(t));
+SAR_range_corrected = zeros(int32(pulses),length(t));
 
 % t=2*d/c;
 %d=f0*T*c/(2*Beta);
@@ -76,7 +77,11 @@ for k=1:pulses
     r=sqrt(R^2+(L/2-step*k)^2);
 
     % Receive echo (get beat)
-    SAR_raw(k,:)=get_beat(r,t,lambda,Beta,T)+randn(1,length(t));
+
+    %SAR_raw(k,:)=get_beat(r,t,lambda,Beta,T)+randn(1,length(t));
+    SAR_raw(k,:)=get_beat(r,t,lambda,Beta,T);
+
+
 
    
 
@@ -88,8 +93,16 @@ end
 
 
 %% Range compression
+
+faxis=0:fs/samples:fs-fs/samples;
+
 for k=1:pulses
     SAR_range_compressed(k,:)=fft(SAR_raw(k,:));
+    SAR_range_corrected(k,:)=rcmc(SAR_raw(k,:),f0,faxis,t);
+
+
+
+
 end
 
 % Edn simulation
@@ -127,34 +140,39 @@ end
 % imagesc(SAR_rd);
 
 %% Display Data
-
-faxis=0:1/fs:samples*1/fs-1/fs;
-figure
-tiledlayout(1,3)
-nexttile
-imagesc(real(SAR_raw));
-xlabel("Sample")
-ylabel("Pulse")
-nexttile
-title("Range compressed data")
-%imagesc(range_cells,azimuth_cells,db((SAR_range_compressed)));
-imagesc(db(abs(SAR_range_compressed)));
-
-
-% plot(real(SAR_raw(1,1:100))
-
-% Range FFT, racalualte beat frequency/range
-
-% azimuth - get overalapping parts of RX/TX
-% get cycle through columns - get chrirp like azimuth signal
-% fftilt?
+display_data
 
 %%
 
 figure
-plot(real(SAR_range_compressed(:,78)));
+
+plot(real(SAR_range_corrected(:,78)));
 
 
+
+%%
+
+%  figure
+%  ind=700;
+%  tiledlayout(3,1)
+%  nexttile
+%  faxis=0:fs/samples:fs-fs/samples;
+%  raxis=faxis*T*c/(2*Beta);
+%  plot(faxis,abs(SAR_range_compressed(ind,:)))
+%  xlabel("IF [Hz]")
+%  title("Frequency domain")
+%  nexttile
+%  plot(raxis,abs(SAR_range_compressed(ind,:)))
+%  xlabel("Slant range [m]")
+%  title("Range domain")
+%  nexttile
+%  [~,mind]=max(abs(SAR_range_compressed(ind,:)));
+%  If=faxis(mind);
+%  f_diff=abs(f0-If);
+%  r0=If*T*c/(2*Beta);
+%  r_diff=R+r0;
+%  f_mod=Beta*2*r_diff/(T*c);
+%  r_corr=(If-f_diff)*T*c/(2*Beta);
 
 
 
@@ -182,12 +200,12 @@ plot(real(SAR_range_compressed(:,78)));
 
 
 
+
+
+
+
+
+
+
+
 % delta f = 2dv/c*f_0
-
-
-
-
-
-
-
-
