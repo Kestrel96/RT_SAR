@@ -77,8 +77,8 @@ for k=1:pulses
     r=sqrt(R^2+(L/2-step*k)^2);
 
     % Receive echo (get beat)
-    SAR_raw(k,:)=get_beat(r,t,lambda,Beta,T)+randn(1,length(t));
-    %SAR_raw(k,:)=get_beat(r,t,lambda,Beta,T);
+    %SAR_raw(k,:)=get_beat(r,t,lambda,Beta,T)+randn(1,length(t));
+    SAR_raw(k,:)=get_beat(r,t,lambda,Beta,T);
 
 
    
