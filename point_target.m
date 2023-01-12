@@ -5,6 +5,7 @@ classdef point_target
     properties
         x = 0
         y = 0
+        vr=0
         refelctivity = 1
     end
 
@@ -15,12 +16,30 @@ classdef point_target
             obj.x = x;
             obj.y = y;
         end
+        function obj=get_vr(obj,vp,xp,yp)
+            alfa=cot((xp-obj.x)/(yp-obj.y));
+            obj.vr=vp*cos(alfa);
 
-        function outputArg = method1(obj,inputArg)
-            %METHOD1 Summary of this method goes here
+
+        end
+
+
+        function beat = get_beat(obj,r,t,lambda,Beta,T)
+            %GET_BEAT Summary of this function goes here
             %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
+
+            c=3e8;
+
+            phi=4*pi*r/lambda; % phase of IF signal
+            %r=10;
+            f_if=Beta*2*r/(T*c); % frequency of IF signal
+            %r=f_if*T*c/(2*Beta);
+            beat=obj.refelctivity* exp(1i*(2*pi*f_if*t+phi));
+
+
+
         end
     end
 end
+
 
