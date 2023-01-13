@@ -3,10 +3,12 @@ classdef point_target
     %   Detailed explanation goes here
 
     properties
-        x = 0
-        y = 0
-        vr=0
-        refelctivity = 1
+        x = 0;
+        y = 0;
+        r = 0;
+        vr=0;
+        refelctivity = 1;
+        antenna_width = 0;
     end
 
     methods
@@ -23,16 +25,37 @@ classdef point_target
 
         end
 
+        function obj=get_ant_width(obj,ant_angle)
+            angle=deg2rad(ant_angle);
+            obj.antenna_width = 2*obj.x*tan(angle/2);
 
-        function beat = get_beat(obj,r,t,lambda,Beta,T)
+        end
+
+        function obj = get_inst_range(obj,v_radar,dt)
+            obj.r=sqrt(obj.x^2+(obj.antenna_width/2-v_radar*dt)^2);
+        end
+
+        function ilum = is_illuminated(obj,y_radar)
+            if(obj.y >= y_radar+obj.antenna_width/2 || obj.y ...
+                    <= y_radar-obj.antenna_width/2)
+                ilum = true;
+                return
+            end
+
+
+            ilum=false;
+
+
+
+        end
+        function beat = get_beat(obj,t,lambda,Beta,T)
             %GET_BEAT Summary of this function goes here
             %   Detailed explanation goes here
 
             c=3e8;
-
-            phi=4*pi*r/lambda; % phase of IF signal
+            phi=4*pi*obj.r/lambda; % phase of IF signal
             %r=10;
-            f_if=Beta*2*r/(T*c); % frequency of IF signal
+            f_if=Beta*2*obj.r/(T*c); % frequency of IF signal
             %r=f_if*T*c/(2*Beta);
             beat=obj.refelctivity* exp(1i*(2*pi*f_if*t+phi));
 

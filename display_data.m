@@ -8,13 +8,14 @@ imagesc(real(SAR_raw));
 xlabel("Sample")
 ylabel("Pulse")
 nexttile
-title("Range compressed data")
 %imagesc(range_cells,azimuth_cells,db((SAR_range_compressed)));
 imagesc(db(abs(SAR_range_compressed)));
+title("Range compressed data")
 nexttile
-title("Range corrected data")
 %imagesc(range_cells,azimuth_cells,db((SAR_range_compressed)));
 imagesc(db(abs(SAR_range_corrected)));
+title("Range corrected data")
+
 
 
 

@@ -1,1 +1,1 @@
-rdr=radar();
+radar=radar_object();
