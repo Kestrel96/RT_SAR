@@ -6,6 +6,9 @@ classdef radar_object
     properties
         c=3e8;
 
+        x=0; %radar position (in range)
+        y=0; % radar position (in azimuth)
+
         fc=4e9; % carrier
         B=25e6; % Bandwidth
         T=5e-3; % Chirp time
@@ -13,13 +16,14 @@ classdef radar_object
         Beta=0 % slope
         lambda=0; % Wavelength
         ant_angle=deg2rad(30); % antenna beam angle
-        sigma_a=L/2; % azimuth resolution
-        sigma_r=c/(2*B);% range resolution
+%         sigma_a=L/2; % azimuth resolution
+%         sigma_r=c/(2*B);% range resolution
         v=10; % platform velocity
+        pulses=1000;
     end
 
     methods
-        function obj = radar(B,T,fc,v,ant_angle)
+        function obj = radar_object(B,T,fc,v,ant_angle)
             %RADAR Construct an instance of this class
             %   Detailed explanation goes here
 

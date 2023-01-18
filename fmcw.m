@@ -25,7 +25,7 @@ L=2*R*tan(ant_angle); % Length of antenna footprint on the ground
 sigma_a=L/2; % azimuth resolution
 sigma_r=c/(2*B);% range resolution
 
-pulses =1000; % pulses during target ilumination
+pulses = 1000; % pulses during target ilumination
 v=10; % platform velocity
 time=L/v; % time of ilumination
 
