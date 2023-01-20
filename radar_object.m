@@ -20,6 +20,12 @@ classdef radar_object
 %         sigma_r=c/(2*B);% range resolution
         v=10; % platform velocity
         pulses=1000;
+
+        SAR_raw_data=[];
+        SAR_range_compressed=[];
+        SAR_rage_corrected=[];
+        SAR_aziuth_compressed=[];
+
     end
 
     methods
