@@ -62,6 +62,10 @@ classdef point_target
 
 
         end
+
+        function point=get_point(obj)
+            point=[obj.x,obj.y];
+        end
     end
 end
 

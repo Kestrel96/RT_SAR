@@ -11,11 +11,24 @@
             "id": "0b2a5bfbbb25c432",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "excalidraw",
+              "state": {
+                "file": "Excalidraw/Drawing 2023-01-20 14.55.30.excalidraw.md"
+              }
+            }
+          },
+          {
+            "id": "1d8719e7e87e2605",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Excalidraw/axes.excalidraw.md"
+              }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -81,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "Excalidraw/axes.excalidraw.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -97,6 +111,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "Excalidraw/axes.excalidraw.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -118,7 +133,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "Excalidraw/axes.excalidraw.md"
+              }
             }
           }
         ]
@@ -139,17 +156,17 @@
       "obsidian-excalidraw-plugin:New Excalidraw drawing": false
     }
   },
-  "active": "0b2a5bfbbb25c432",
+  "active": "1d8719e7e87e2605",
   "lastOpenFiles": [
-    "Pasted Image 20230113190640_817.svg",
+    "Excalidraw/Drawing 2023-01-20 14.55.30.excalidraw.md",
     "Excalidraw/axes.excalidraw.md",
+    "Pasted Image 20230120143201_029.svg",
+    "Pasted Image 20230113190640_810.svg",
+    "Pasted Image 20230113190640_817.svg",
+    "Pasted Image 20230113190640_827.svg",
+    "Pasted Image 20230120143201_010.svg",
+    "Pasted Image 20230120143201_019.svg",
     "SAR Basics.md",
-    "Excalidraw/axes.excalidraw",
-    "Excalidraw/Drawing 2023-01-13 19.00.51.excalidraw.md",
-    "axes.md",
-    "Untitled.canvas",
-    "Pasted Image 20230113190133_467.svg",
-    "Pasted Image 20230113190133_500.svg",
-    "Pasted Image 20230113190133_482.svg"
+    "Excalidraw/axes.excalidraw"
   ]
 }
