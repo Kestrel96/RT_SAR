@@ -7,8 +7,8 @@ end
 scatter(radar.x,radar.y,"x")
 plot([radar.x,radar.ant_x], [radar.y,radar.ant_y_upper],'-.' ...
     ,[radar.x,radar.ant_x], [radar.y,radar.ant_y_lower],'-.')
-xlim([-5,25]);
-ylim([-5,25]);
+xlim([0,25]);
+%ylim([0,25]);
 title("Scene setup")
 xlabel("Range [m]")
 ylabel("Azimuth [m]")
