@@ -19,7 +19,7 @@ classdef radar_object
         B=25e6; % Bandwidth
         T=5e-3; % Chirp time
 
-        PRI=1e3;
+        PRI=1e-3;
 
         Beta=0 % slope
         lambda=0; % Wavelength
@@ -69,15 +69,16 @@ classdef radar_object
 
             
             f_max=obj.Beta*2*max_distance/(obj.T*obj.c);
-            obj.fs = 5*f_max;
+            obj.fs = 3*f_max;
         end
 
-        function max_sig_length = get_max_signal_length(obj,distance_vector)
+        function max_sig_length = get_max_signal_length(obj,max_distance)
 
 
-            max_distance = max(distance_vector)+10;
+            max_distance = max_distance+5;
             f_max=obj.Beta*2*max_distance/(obj.T*obj.c);
-            max_sig_length = 5*f_max*obj.PRI;
+            max_sig_length = 3*f_max*obj.PRI;
+            obj.signal_length=max_sig_length;
 
         end
         function obj=get_ant_vertices(obj,max_distance)
