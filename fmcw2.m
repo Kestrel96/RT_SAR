@@ -8,8 +8,8 @@ fc=4e9; % carrier
 B=25e6; % Bandwidth
 T=5e-3; % Chirp time
 Beta=B/T; % slope
-ant_angle=10; %antenna aperture angle
-v=50; % platform's velocity
+ant_angle=30; %antenna aperture angle
+v=100; % platform's velocity
 max_range=100;
 
 radar=radar_object(B,T,fc,v,ant_angle);
@@ -23,11 +23,11 @@ radar=radar.get_fs(max_range);
 
 
 
-t1=point_target(10,10);
+t1=point_target(100,10);
 t2=point_target(25,15);
 t3=point_target(10,20);
-t4=point_target(10,15);
-targets=[t1,t2,t3];
+t4=point_target(20,15);
+targets=[t1,t2,t3,t4];
 
 for k=1:length(targets)
     targets(k)=targets(k).get_ant_width(ant_angle);
@@ -39,11 +39,11 @@ show_scene
 %% Sensing
 
 azimuth_distance = 25;
-steps=azimuth_distance / radar.az_step;
+steps=floor(azimuth_distance / radar.az_step);
 %tmp_signal=zeros(1,radar.get_max_signal_length(max_range));
 fs=radar.fs;
 %radar.fs=radar.fs*10000;
-smps=1400;
+smps=700;
 t=0:1/radar.fs:1/radar.fs*smps-1/radar.fs;
 
 figure
@@ -56,7 +56,7 @@ for k=1:steps
         illuminated=targets(l).is_illuminated(radar.y);
 
         if(illuminated)
-            targets(l)=targets(l).get_inst_range(radar.v,k*radar.PRI);
+            targets(l)=targets(l).get_inst_range2(radar.x,radar.y);
             tmp_signal=tmp_signal+targets(l).get_beat(t,radar.lambda,radar.Beta,radar.T);
             %plot(real(tmp_signal));
 
@@ -86,12 +86,22 @@ for k=1:steps
 end
 
 
+
+% %% Azimuth compression
+%
+%
+% for k=1:smps
+%     radar.SAR_azimuth_compressed(:,k)=fft(radar.SAR_raw_data(:,k));
+%     disp(k);
+% end
+
 %%
 close all
 figure
 tiledlayout(1,3)
 nexttile
 imagesc(real(radar.SAR_raw_data));
+title("Raw Data")
 xlabel("Sample")
 ylabel("Pulse")
 
@@ -99,9 +109,50 @@ ylabel("Pulse")
 nexttile
 azimuth_axis=0:radar.az_step:30;
 imagesc(db(abs(radar.SAR_range_compressed)));
+
+title("Range Compressed")
 xlabel("Beat frequency [Hz]")
 ylabel("Pulse")
 
 nexttile
 show_scene
 
+
+
+%%
+
+chrp=radar.SAR_range_compressed(:,234);
+chrp_near=radar.SAR_range_compressed(:,59);
+
+
+
+
+%%
+r=zeros(1,steps);
+radar.y=0;
+for k=1:steps
+    
+    t1=t1.get_inst_range2(radar.x,radar.y);
+    r(k)=t1.r;
+    radar.y=radar.y+radar.az_step;
+
+end
+
+% r(1:100)=0;
+% r(500:end)=0;
+
+lambda=radar.lambda;
+%phi=4*pi*R/lambda;
+phase_shifts=4*pi*r/lambda;
+%f_if=Beta*2*R/(T*c);
+chrp2=exp(1i*(phase_shifts));
+
+figure
+plot(imag(chrp/max(chrp)))
+hold on
+plot(real(chrp2));
+hold off
+
+figure
+[c,lags]=xcorr(imag(chrp/max(chrp)),real(chrp2));
+stem(lags,c)

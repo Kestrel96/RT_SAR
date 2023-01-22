@@ -33,7 +33,7 @@ classdef radar_object
         SAR_raw_data=[];
         SAR_range_compressed=[];
         SAR_rage_corrected=[];
-        SAR_aziuth_compressed=[];
+        SAR_azimuth_compressed=[];
         signal_length=0;
 
         fs = 500e3; % ADC smapling rate

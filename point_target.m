@@ -35,6 +35,11 @@ classdef point_target
             obj.r=sqrt(obj.x^2+(obj.antenna_width/2-v_radar*dt)^2);
         end
 
+        function obj = get_inst_range2(obj,radar_x,radar_y)
+            obj.r=sqrt((obj.x-radar_x)^2+(obj.y-radar_y)^2);
+            
+        end
+
         function ilum = is_illuminated(obj,y_radar)
             if(obj.y <= y_radar+obj.antenna_width/2 && obj.y ...
                     >= y_radar-obj.antenna_width/2)
@@ -54,7 +59,7 @@ classdef point_target
 
             c=3e8;
             phi=4*pi*obj.r/lambda; % phase of IF signal
-            %r=10;
+            %obj.r=obj.x;
             f_if=Beta*2*obj.r/(T*c); % frequency of IF signal
             %r=f_if*T*c/(2*Beta);
             beat=obj.refelctivity* exp(1i*(2*pi*f_if*t+phi));
