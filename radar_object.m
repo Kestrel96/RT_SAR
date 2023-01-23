@@ -109,10 +109,12 @@ classdef radar_object
                 steps=2*max_range*tan(obj.ant_angle/2)/obj.az_step;
                 steps=floor(steps);
 
-
+                no_sample_count=0;
                 if(antenna_width>=1)
 
                     inst_range=ones(1,steps);
+                    no_sample_count=0;
+
                     for l=1:steps
 
                         if(radar_azimuth<antenna_width/2)
@@ -120,18 +122,21 @@ classdef radar_object
                             radar_azimuth=radar_azimuth+obj.az_step;
                         
                         else
-                            inst_range(l)=0;
+                            inst_range(l)=997;
+                            no_sample_count=no_sample_count+1;
                         end
 
                     end
                 else
                     inst_range=zeros(1,steps);
+
                 end
 
                 phase_shifts=4*pi*inst_range/obj.lambda;
                 reference(1,:)=exp(1i*(phase_shifts));
                 reference=reference(end:-1:1);
                 reference=conj(reference);
+                reference(1:no_sample_count)=997;
                 obj.SAR_azimuth_reference_LUT(k,:)=reference;
 
 

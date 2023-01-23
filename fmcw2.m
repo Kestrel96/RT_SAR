@@ -163,8 +163,13 @@ phase_shifts=4*pi*r/lambda;
 chrp2=exp(1i*(phase_shifts));
 
 %y=filter(radar.SAR_azimuth_reference_LUT(15,455:end),1,chrp);
-y=conv(radar.SAR_azimuth_reference_LUT(15,455:end),chrp);
+h=radar.SAR_azimuth_reference_LUT(15,455:end);
+w=blackman(length(h));
+h=h.*w';
+y=conv(h,chrp);
 y=y(40:end);
+
+
 
 figure
 tiledlayout(3,1)
@@ -179,7 +184,7 @@ hold off
 title("azimuth chirp")
 xlim([0,600])
 nexttile
-plot(real(radar.SAR_azimuth_reference_LUT(15,455:end)))
+plot(real(h))
 xlim([0,600])
 title("Reference")
 
@@ -190,11 +195,11 @@ title("Azimuth compressed")
 % move either reference or signal by size of reference s(t-t_imp)
 
 
+%%
 
-% chrp2=chrp2(end:-1:1);
-% chrp2=conj(chrp2);
-% 
-% y=filter(chrp2,1,chrp);
-% 
-% figure
-% plot(real(y))
+figure 
+h=radar.SAR_azimuth_reference_LUT(15,:);
+h=h(h~=997);
+plot(real(h))
+
+
