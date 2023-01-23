@@ -34,10 +34,11 @@ classdef radar_object
         SAR_range_compressed=[];
         SAR_rage_corrected=[];
         SAR_azimuth_compressed=[];
+        SAR_azimuth_reference_LUT=[];
         signal_length=0;
 
         fs = 500e3; % ADC smapling rate
-        
+
 
     end
 
@@ -67,7 +68,7 @@ classdef radar_object
 
         function obj=get_fs(obj,max_distance)
 
-            
+
             f_max=obj.Beta*2*max_distance/(obj.T*obj.c);
             obj.fs = 3*f_max;
         end
@@ -82,16 +83,61 @@ classdef radar_object
 
         end
         function obj=get_ant_vertices(obj,max_distance)
-            
+
             L = 2*max_distance*tan(obj.ant_angle/2);
 
             obj.ant_y_lower=obj.y-L/2;
             obj.ant_y_upper=obj.y+L/2;
             obj.ant_x=max_distance;
             obj.max_ant_length=L;
-            
 
-            
+
+
+        end
+
+        function obj=get_azimuth_reference(obj,max_range)
+
+            % Range reference with 1 m intervals between targets
+            for k=1:max_range
+
+                r=k;
+                antenna_width = 2*r*tan(obj.ant_angle/2);
+                antenna_width=floor(antenna_width);
+
+                radar_azimuth=-antenna_width/2;
+
+                steps=2*max_range*tan(obj.ant_angle/2)/obj.az_step;
+                steps=floor(steps);
+
+
+                if(antenna_width>=1)
+
+                    inst_range=ones(1,steps);
+                    for l=1:steps
+
+                        if(radar_azimuth<antenna_width/2)
+                            inst_range(l)=sqrt(radar_azimuth^2+r^2);
+                            radar_azimuth=radar_azimuth+obj.az_step;
+                        
+                        else
+                            inst_range(l)=0;
+                        end
+
+                    end
+                else
+                    inst_range=zeros(1,steps);
+                end
+
+                phase_shifts=4*pi*inst_range/obj.lambda;
+                reference(1,:)=exp(1i*(phase_shifts));
+                reference=reference(end:-1:1);
+                reference=conj(reference);
+                obj.SAR_azimuth_reference_LUT(k,:)=reference;
+
+
+            end
+
+
         end
     end
 end

@@ -15,6 +15,7 @@ max_range=100;
 radar=radar_object(B,T,fc,v,ant_angle);
 radar=radar.get_ant_vertices(max_range);
 radar=radar.get_fs(max_range);
+radar=radar.get_azimuth_reference(100);
 
 
 %% Create targets
@@ -24,9 +25,9 @@ radar=radar.get_fs(max_range);
 
 
 t1=point_target(100,10);
-t2=point_target(25,15);
+t2=point_target(15,25);
 t3=point_target(10,20);
-t4=point_target(20,15);
+t4=point_target(15,10);
 targets=[t1,t2,t3,t4];
 
 for k=1:length(targets)
@@ -38,7 +39,7 @@ show_scene
 
 %% Sensing
 
-azimuth_distance = 25;
+azimuth_distance = 50;
 steps=floor(azimuth_distance / radar.az_step);
 %tmp_signal=zeros(1,radar.get_max_signal_length(max_range));
 fs=radar.fs;
@@ -122,19 +123,32 @@ show_scene
 %%
 
 chrp=radar.SAR_range_compressed(:,234);
-chrp_near=radar.SAR_range_compressed(:,59);
+chrp=radar.SAR_range_compressed(:,36);
 
+chrp=chrp/max(abs(chrp));
 
 
 
 %%
 r=zeros(1,steps);
 radar.y=0;
+radar=radar.get_ant_vertices(max_range);
+
+l=1;
+t5=point_target(25,10);
+t5=t5.get_ant_width(ant_angle);
 for k=1:steps
     
-    t1=t1.get_inst_range2(radar.x,radar.y);
-    r(k)=t1.r;
+    il=t5.is_illuminated(radar.y);
+    disp(il)
+    if(il)
+    t5=t5.get_inst_range2(radar.x,radar.y);
+    r(l)=t5.r;
+    end
+
     radar.y=radar.y+radar.az_step;
+    radar=radar.get_ant_vertices(max_range);
+    l=l+1;
 
 end
 
@@ -145,14 +159,42 @@ lambda=radar.lambda;
 %phi=4*pi*R/lambda;
 phase_shifts=4*pi*r/lambda;
 %f_if=Beta*2*R/(T*c);
+
 chrp2=exp(1i*(phase_shifts));
 
-figure
-plot(imag(chrp/max(chrp)))
-hold on
-plot(real(chrp2));
-hold off
+%y=filter(radar.SAR_azimuth_reference_LUT(15,455:end),1,chrp);
+y=conv(radar.SAR_azimuth_reference_LUT(15,455:end),chrp);
+y=y(40:end);
 
 figure
-[c,lags]=xcorr(imag(chrp/max(chrp)),real(chrp2));
-stem(lags,c)
+tiledlayout(3,1)
+% plot(imag(chrp/max(chrp)))
+% hold on
+nexttile
+plot(real(chrp));
+hold on
+plot(abs(y)/max(abs(y)));
+%plot(abs(y));
+hold off
+title("azimuth chirp")
+xlim([0,600])
+nexttile
+plot(real(radar.SAR_azimuth_reference_LUT(15,455:end)))
+xlim([0,600])
+title("Reference")
+
+nexttile
+
+plot(db(real(y)));
+title("Azimuth compressed")
+% move either reference or signal by size of reference s(t-t_imp)
+
+
+
+% chrp2=chrp2(end:-1:1);
+% chrp2=conj(chrp2);
+% 
+% y=filter(chrp2,1,chrp);
+% 
+% figure
+% plot(real(y))
