@@ -163,8 +163,8 @@ phase_shifts=4*pi*r/lambda;
 chrp2=exp(1i*(phase_shifts));
 
 %y=filter(radar.SAR_azimuth_reference_LUT(15,455:end),1,chrp);
-h=radar.SAR_azimuth_reference_LUT(15,:);
-h=h(h~=997);
+h=cell2mat(radar.SAR_azimuth_reference_LUT{15});
+
 w=blackman(length(h));
 h=h.*w';
 y=conv(h,chrp);

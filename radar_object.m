@@ -105,10 +105,11 @@ classdef radar_object
                 steps = floor(steps);
 
                 no_sample_count = 0;
-
+                
+                reference=[];
                 if (antenna_width >= 1)
 
-                    inst_range = ones(1, steps);
+                    inst_range = [];
                     no_sample_count = 0;
 
                     for l = 1:steps
@@ -137,7 +138,7 @@ classdef radar_object
                 reference = reference(end:-1:1);
                 reference = conj(reference);
                 
-                obj.SAR_azimuth_reference_LUT(k) = {reference};
+                obj.SAR_azimuth_reference_LUT{k} = {reference};
 
             end
 
