@@ -59,7 +59,7 @@ classdef point_target
 
             c=3e8;
             phi=4*pi*obj.r/lambda; % phase of IF signal
-            obj.r=obj.x;
+            %obj.r=obj.x;
             f_if=Beta*2*obj.r/(T*c); % frequency of IF signal
             %r=f_if*T*c/(2*Beta);
             beat=obj.refelctivity* exp(1i*(2*pi*f_if*t+phi));

@@ -105,7 +105,7 @@ classdef radar_object
                 steps = floor(steps);
 
                 no_sample_count = 0;
-                
+
                 reference=[];
                 if (antenna_width >= 1)
 
@@ -117,7 +117,7 @@ classdef radar_object
                         if (radar_azimuth < antenna_width / 2)
                             inst_range(l) = sqrt(radar_azimuth ^ 2 + r ^ 2);
                             radar_azimuth = radar_azimuth + obj.az_step;
-                            
+
 
                         else
                             break
@@ -131,14 +131,89 @@ classdef radar_object
                     inst_range = zeros(1, steps);
 
                 end
-                
-                
+
+
                 phase_shifts = 4 * pi * inst_range / obj.lambda;
                 reference(1, :) = exp(1i * (phase_shifts));
                 reference = reference(end:-1:1);
                 reference = conj(reference);
-                
+
                 obj.SAR_azimuth_reference_LUT{k} = {reference};
+
+            end
+
+        end
+
+        function obj=azimuth_compression(obj,samples)
+
+            % get azimuth chirp signal
+            faxis=0:obj.fs/samples:obj.fs-obj.fs/samples;
+            raxis=faxis*obj.T*obj.c/(2*obj.Beta);
+
+
+
+
+            for k=1:samples
+
+                R=floor(raxis(k));
+                if(R==0)
+                    continue
+                end
+
+                if(R>numel(obj.SAR_azimuth_reference_LUT))
+                    break;
+                end
+                azimuth_chirp=obj.SAR_range_compressed(:,k);
+                gain=max(real(azimuth_chirp));
+                azimuth_chirp=azimuth_chirp/max(azimuth_chirp);
+
+                h=cell2mat(obj.SAR_azimuth_reference_LUT{R});
+
+                w=blackman(length(h));
+                h=h.*w';
+                filtered=conv(h,azimuth_chirp);
+                %delay output by timp/2
+                filtered=filtered(length(h)/2:(end-length(h)/2));
+                filtered=filtered'*gain;
+
+
+
+
+                if(k==281)
+                    close all
+                    figure
+                    tiledlayout(3,1)
+                    % plot(imag(chrp/max(chrp)))
+                    % hold on
+                    nexttile
+                    plot(raxis(1:length(azimuth_chirp)),real(azimuth_chirp));
+                    hold on
+                    plot(raxis(1:length(azimuth_chirp)),abs(filtered)/max(abs(filtered)),'-.','LineWidth',3);
+                    title("Range compressed data")
+                    xlabel("Range [m]")
+                    ylabel("Amplitude (normalized)")
+                    legend("Azimuth Chirp","Matched")
+                    %plot(abs(y));
+                    hold off
+                    title("azimuth chirp")
+                    %xlim([0,length(azimuth_chirp)])
+                    nexttile
+                    plot(real(h))
+                    %xlim([0,length(azimuth_chirp)])
+                    title("Reference")
+
+                    nexttile
+                    plot(raxis(1:length(azimuth_chirp)),db(abs(filtered))-mean(db(abs(filtered))));
+                    title("Azimuth compressed")
+                    ylim([-10,150]);
+                    %xlim([0,length(azimuth_chirp)]);
+
+
+
+                end
+
+
+                obj.SAR_azimuth_compressed(:,k)=abs(filtered);
 
             end
 
