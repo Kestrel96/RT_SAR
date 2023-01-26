@@ -30,7 +30,7 @@ disp(samples)
 %% Create targets
 
 
-t1=point_target(100,floor(azimuth_distance/2));
+t1=point_target(85,floor(azimuth_distance/2));
 t2=point_target(90,15);
 t3=point_target(80,20);
 t4=point_target(70,25);
