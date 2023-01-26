@@ -184,11 +184,12 @@ for k=1:steps
 
 end
 
-% extended abstract dla prof. Misurewicza
+% extended abstract dla prof. Misiurewicza
 % BPA w druga stronę - przeliczyć odległość na częstoliwość i ją modulować
 % jak zogniskować obraz dla celów które nie są centralnie w wiązce (RCMC?)
 % jak podzielić to co mam na komórki odległościowe? 
-% Gdzie ten doppler??
+% Gdzie ten doppler, jak wyciągnąć częstotliwość dopplera z sygnału
+% zdudnień?
 
 
 
