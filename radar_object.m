@@ -18,13 +18,13 @@ classdef radar_object
         B = 25e6; % Bandwidth
         T = 5e-3; % Chirp time
 
-        PRI = 1e-3;
+        PRI = 5e-4;
 
         Beta = 0 % slope
         lambda = 0; % Wavelength
         ant_angle = deg2rad(30); % antenna beam angle
-        %         sigma_a=L/2; % azimuth resolution
-        %         sigma_r=c/(2*B);% range resolution
+                sigma_a; % azimuth resolution
+                 sigma_r;% range resolution
         v = 10; % platform velocity
         pulses = 1000;
         az_step = 0;
@@ -42,7 +42,7 @@ classdef radar_object
 
     methods
 
-        function obj = radar_object(B, T, fc, v, ant_angle)
+        function obj = radar_object(B, T, fc, v,PRI, ant_angle)
             %RADAR Construct an instance of this class
             %   Detailed explanation goes here
 
@@ -52,9 +52,14 @@ classdef radar_object
             obj.fc = fc;
             obj.ant_angle = deg2rad(ant_angle);
 
+            
+            obj.sigma_r=obj.c/(2*obj.B);
+
             obj.Beta = B / T;
             obj.lambda = obj.c / fc;
+            obj.PRI=PRI;
             obj.az_step = obj.PRI * obj.v;
+            
 
         end
 
@@ -82,6 +87,7 @@ classdef radar_object
         function obj = get_ant_vertices(obj, max_distance)
 
             L = 2 * max_distance * tan(obj.ant_angle / 2);
+            obj.sigma_a=L/2;
 
             obj.ant_y_lower = obj.y - L / 2;
             obj.ant_y_upper = obj.y + L / 2;
@@ -173,44 +179,50 @@ classdef radar_object
                 h=h.*w';
                 filtered=conv(h,azimuth_chirp);
                 %delay output by timp/2
-                filtered=filtered(length(h)/2:(end-length(h)/2));
+                A=length(h)/2;
+                filtered=filtered(A:(end-A));
                 filtered=filtered'*gain;
 
 
 
 
-                if(k==281)
-                    close all
-                    figure
-                    tiledlayout(3,1)
-                    % plot(imag(chrp/max(chrp)))
-                    % hold on
-                    nexttile
-                    plot(raxis(1:length(azimuth_chirp)),real(azimuth_chirp));
-                    hold on
-                    plot(raxis(1:length(azimuth_chirp)),abs(filtered)/max(abs(filtered)),'-.','LineWidth',3);
-                    title("Range compressed data")
-                    xlabel("Range [m]")
-                    ylabel("Amplitude (normalized)")
-                    legend("Azimuth Chirp","Matched")
-                    %plot(abs(y));
-                    hold off
-                    title("azimuth chirp")
-                    %xlim([0,length(azimuth_chirp)])
-                    nexttile
-                    plot(real(h))
-                    %xlim([0,length(azimuth_chirp)])
-                    title("Reference")
-
-                    nexttile
-                    plot(raxis(1:length(azimuth_chirp)),db(abs(filtered))-mean(db(abs(filtered))));
-                    title("Azimuth compressed")
-                    ylim([-10,150]);
-                    %xlim([0,length(azimuth_chirp)]);
-
-
-
-                end
+%                 if(k==281)
+%                     close all
+%                     figure
+%                     tiledlayout(3,1)
+%                     % plot(imag(chrp/max(chrp)))
+%                     % hold on
+%                     nexttile
+%                     plot(raxis(1:length(azimuth_chirp)),real(azimuth_chirp));
+%                     hold on
+%                     plot(raxis(1:length(azimuth_chirp)),abs(filtered)/max(abs(filtered)),'-.','LineWidth',3);
+%                     title("Range compressed data")
+%                     xlabel("Range [m]")
+%                     ylabel("Amplitude (normalized)")
+%                     legend("Azimuth Chirp","Matched")
+%                     %plot(abs(y));
+%                     hold off
+%                     title("azimuth chirp")
+%                     %xlim([0,length(azimuth_chirp)])
+%                     nexttile
+%                     plot(real(h))
+%                     hold on
+%                     plot(w,'--')
+%                 
+%                     %xlim([0,length(azimuth_chirp)])
+%                     title("Reference")
+%                     legend("Azimuth Reference Function","Window (Blackmann)")
+%                     hold off
+% 
+%                     nexttile
+%                     plot(raxis(1:length(azimuth_chirp)),db(abs(filtered))-mean(db(abs(filtered))));
+%                     title("Azimuth compressed")
+%                     ylim([-10,150]);
+%                     %xlim([0,length(azimuth_chirp)]);
+% 
+% 
+% 
+%                 end
 
 
                 obj.SAR_azimuth_compressed(:,k)=abs(filtered);
