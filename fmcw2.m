@@ -10,7 +10,7 @@ T=10e-3; % Chirp time
 Beta=B/T; % slope
 ant_angle=30; %antenna aperture angle
 v=75; % platform's velocity
-PRI=5e-4; % Pulse repetition interval
+PRI=4e-4; % Pulse repetition interval
 max_range=100;% max range of radar, used to calculate antenna max width and
 % azimuth reference functions
 
@@ -33,6 +33,7 @@ steps=floor(azimuth_distance / radar.az_step); % Azimuth steps
 PRF=1/PRI;
 
 rd_axis=-PRF/2:PRF/steps:PRF/2-1/PRF;
+
 faxis=0:radar.fs/samples:radar.fs-1/radar.fs;
 raxis=faxis*radar.T*radar.c/(2*radar.Beta);
 
@@ -47,9 +48,9 @@ t5=point_target(75,50);
 t6=point_target(70,20);
 t7=point_target(20,30);
 t8=point_target(80,25);
-%targets=[t1,t2,t3,t4,t5,t6,t7,t8];
+targets=[t1,t2,t3,t4,t5,t6,t7,t8];
 
-targets=[t4,t5];
+%targets=[t4,t5];
 
 % Determine antenna length for every target
 for k=1:length(targets)
@@ -211,14 +212,14 @@ tiledlayout(1,2)
 nexttile
 range_doppler=fft(radar.SAR_range_compressed,[],1);
 range_doppler=fftshift(range_doppler,1);
- imagesc(raxis,rd_axis,abs(range_doppler));
+imagesc(raxis,rd_axis,abs(range_doppler));
 ylabel("PRF [Hz]")
 xlabel("Range [m]")
 xlim([68,73])
 
 nexttile
 imagesc(1:samples,rd_axis,abs(range_doppler));
-xlim([58,62])
+%xlim([58,62])
 %delta_R(f)=lambda^2*R*f^2/(8*v)
 
 
@@ -254,15 +255,23 @@ end
 
 
 %%
-
-figure
-plot(rd_axis,delta_R(:,60))
-xline(416)
+coef=radar.T*radar.c/(2*radar.Beta);
+delta_f=delta_R/coef;
+delta_samples=delta_f/(radar.fs/samples);
+ figure
+ plot(rd_axis,delta_samples(:,66))
+ xline(592)
 %%
-%f_az=-PRF/2+1/PRF:PRF/steps:PRF/2;
-%obj.sigma_r=obj.c/(2*obj.B);
-%raxis=faxis*obj.T*obj.c/(2*obj.Beta);
-
+RD_corrected=rcmc2(range_doppler,delta_samples);
+figure
+tiledlayout(1,2)
+nexttile
+imagesc(abs(RD_corrected));
+RD_ifft=fftshift(RD_corrected,1);
+RD_ifft=ifft(RD_ifft,[],1);
+nexttile
+imagesc(abs(RD_ifft));
+%%
 
 %%
 % for k=1:samples
