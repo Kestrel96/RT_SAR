@@ -23,7 +23,7 @@ radar=radar.get_fs(max_range);
 samples=floor(radar.PRI*radar.fs);% Max no. of samples of beat signal
 radar=radar.get_azimuth_reference(max_range);
 
-azimuth_samples=2000;% samples in azimuth (related to distance covered by platform)
+azimuth_samples=3500;% samples in azimuth (related to distance covered by platform)
 azimuth_distance = radar.az_step*azimuth_samples;
 disp(samples)
 
@@ -206,7 +206,7 @@ compare_scene
 % % zdudnień?
 
 %% Range Doppler 
- close all
+
 figure
 tiledlayout(1,2)
 nexttile
@@ -266,7 +266,7 @@ RD_corrected=rcmc2(range_doppler,delta_samples);
 figure
 tiledlayout(1,2)
 nexttile
-imagesc(abs(RD_corrected));
+imagesc(abs(radar.SAR_range_compressed));
 RD_ifft=fftshift(RD_corrected,1);
 RD_ifft=ifft(RD_ifft,[],1);
 nexttile
