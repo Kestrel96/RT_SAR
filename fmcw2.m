@@ -8,7 +8,7 @@ fc=5e9; % carrier
 B=25e6; % Bandwidth
 T=10e-3; % Chirp time
 Beta=B/T; % slope
-ant_angle=30; %antenna aperture angle
+ant_angle=60; %antenna aperture angle
 v=75; % platform's velocity
 PRI=4e-4; % Pulse repetition interval
 max_range=100;% max range of radar, used to calculate antenna max width and
@@ -102,6 +102,69 @@ for k=1:steps
     radar.SAR_range_compressed(k,:)=fft(radar.SAR_raw_data(k,:));
     disp(k);
 end
+%% Range Doppler 
+
+figure
+tiledlayout(1,2)
+nexttile
+range_doppler=fft(radar.SAR_range_compressed,[],1);
+range_doppler=fftshift(range_doppler,1);
+imagesc(raxis,rd_axis,abs(range_doppler));
+ylabel("PRF [Hz]")
+xlabel("Range [m]")
+xlim([68,73])
+
+nexttile
+imagesc(1:samples,rd_axis,abs(range_doppler));
+%xlim([58,62])
+%delta_R(f)=lambda^2*R*f^2/(8*v)
+
+
+for k=1:length(rd_axis)
+    
+    f=rd_axis(k);
+    %delta_R(f)=lambda^2*R*f^2/(8*v)
+    delta_R(k,:)=radar.lambda^2*raxis*f^2/(8*v^2);
+end
+
+
+
+
+RD_corrected=range_doppler;
+
+
+for k=1:length(rd_axis)
+
+    for l=1:length(raxis)
+        dr=delta_R(k,l);
+        fa=rd_axis(k);
+        shift_sig=exp(-1i*2*pi*dr);
+        RD_corrected(k,l)=RD_corrected(k,l).*shift_sig;
+
+
+    end
+end
+
+%%
+coef=radar.T*radar.c/(2*radar.Beta);
+delta_f=delta_R/coef;
+delta_samples=delta_f/(radar.fs/samples);
+%  figure
+%  plot(rd_axis,delta_samples(:,66))
+%  xline(592)
+%%
+RD_corrected=rcmc2(range_doppler,delta_samples);
+figure
+tiledlayout(1,2)
+nexttile
+imagesc(abs(radar.SAR_range_compressed));
+RD_ifft=fftshift(RD_corrected,1);
+RD_ifft=ifft(RD_ifft,[],1);
+nexttile
+imagesc(abs(RD_ifft));
+
+
+%radar.SAR_range_compressed=RD_ifft;
 
 
 
@@ -205,48 +268,6 @@ compare_scene
 % % Gdzie ten doppler, jak wyciągnąć częstotliwość dopplera z sygnału
 % % zdudnień?
 
-%% Range Doppler 
-
-figure
-tiledlayout(1,2)
-nexttile
-range_doppler=fft(radar.SAR_range_compressed,[],1);
-range_doppler=fftshift(range_doppler,1);
-imagesc(raxis,rd_axis,abs(range_doppler));
-ylabel("PRF [Hz]")
-xlabel("Range [m]")
-xlim([68,73])
-
-nexttile
-imagesc(1:samples,rd_axis,abs(range_doppler));
-%xlim([58,62])
-%delta_R(f)=lambda^2*R*f^2/(8*v)
-
-
-for k=1:length(rd_axis)
-    
-    f=rd_axis(k);
-    %delta_R(f)=lambda^2*R*f^2/(8*v)
-    delta_R(k,:)=radar.lambda^2*raxis*f^2/(8*v^2);
-end
-
-
-
-
-RD_corrected=range_doppler;
-
-
-for k=1:length(rd_axis)
-
-    for l=1:length(raxis)
-        dr=delta_R(k,l);
-        fa=rd_axis(k);
-        shift_sig=exp(-1i*2*pi*dr);
-        RD_corrected(k,l)=RD_corrected(k,l).*shift_sig;
-
-
-    end
-end
 
 % figure 
 % imagesc(raxis,rd_axis,abs(RD_corrected));
@@ -254,23 +275,7 @@ end
 % % xlabel("Range [m]")
 
 
-%%
-coef=radar.T*radar.c/(2*radar.Beta);
-delta_f=delta_R/coef;
-delta_samples=delta_f/(radar.fs/samples);
- figure
- plot(rd_axis,delta_samples(:,66))
- xline(592)
-%%
-RD_corrected=rcmc2(range_doppler,delta_samples);
-figure
-tiledlayout(1,2)
-nexttile
-imagesc(abs(radar.SAR_range_compressed));
-RD_ifft=fftshift(RD_corrected,1);
-RD_ifft=ifft(RD_ifft,[],1);
-nexttile
-imagesc(abs(RD_ifft));
+
 %%
 
 %%
