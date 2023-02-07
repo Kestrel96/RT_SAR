@@ -133,17 +133,17 @@ end
 RD_corrected=range_doppler;
 
 
-for k=1:length(rd_axis)
-
-    for l=1:length(raxis)
-        dr=delta_R(k,l);
-        fa=rd_axis(k);
-        shift_sig=exp(-1i*2*pi*dr);
-        RD_corrected(k,l)=RD_corrected(k,l).*shift_sig;
-
-
-    end
-end
+% for k=1:length(rd_axis)
+% 
+%     for l=1:length(raxis)
+%         dr=delta_R(k,l);
+%         fa=rd_axis(k);
+%         shift_sig=exp(-1i*2*pi*dr);
+%         RD_corrected(k,l)=RD_corrected(k,l).*shift_sig;
+% 
+% 
+%     end
+% end
 
 %%
 coef=radar.T*radar.c/(2*radar.Beta);
@@ -164,7 +164,7 @@ nexttile
 imagesc(abs(RD_ifft));
 
 
-%radar.SAR_range_compressed=RD_ifft;
+radar.SAR_range_compressed=RD_ifft;
 
 
 

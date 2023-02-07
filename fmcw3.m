@@ -44,14 +44,14 @@ azimuth_axis=0:radar.az_step:azimuth_distance-radar.az_step; %Azimuth as distanc
 t1=point_target(85,floor(azimuth_distance/2));
 t2=point_target(100,15);
 t3=point_target(80,20);
-t4=point_target(70,floor(azimuth_distance/2));
+t4=point_target(70,floor(azimuth_distance/2+30));
 t5=point_target(75,50);
 t6=point_target(70,20);
 t7=point_target(20,30);
 t8=point_target(80,25);
-%targets=[t1,t2,t3,t4,t5,t6,t7,t8];
+targets=[t1,t2,t3,t4,t5,t6,t7,t8];
 
-targets=[t4,t5];
+%targets=[t4,t5];
 
 % Determine antenna length for every target
 for k=1:length(targets)
@@ -100,7 +100,28 @@ end
 SAR_range_compressed=range_compresion(radar.SAR_raw_data,steps);
 
 %% RCMC
+% Range-Doppler transform
+RD_data=range_doppler_transform(SAR_range_compressed);
+delta_R=r_shift(rd_axis,raxis,radar.lambda,radar.v);
+
+% Get shift as samples
+coef=radar.T*radar.c/(2*radar.Beta);
+delta_f=delta_R/coef;
+delta_samples=delta_f/(radar.fs/samples);
+% Range correction
+RD_range_corrected=rcmc2(RD_data,delta_samples,samples);
+%  Range-Doppler invert tranform
+SAR_range_corrected=range_doppler_invert(RD_range_corrected);
+%show step results
+display_range_correction
+
 %% Azimuth compression
+
+%radar.SAR_rage_corrected=SAR_range_corrected;
+radar.SAR_range_compressed=SAR_range_corrected;
+%radar.SAR_range_compressed=SAR_range_compressed;
+radar=radar.azimuth_compression(samples);
+
 %% Display
 display_results
 
