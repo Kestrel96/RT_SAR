@@ -1,5 +1,8 @@
 *.asv
 graphics/*
+build/*
+.vscode
+
 
 
 !.gitkeep
